@@ -1,0 +1,52 @@
+let cart = [];
+
+function addToCart(product, price) {
+  cart.push({ product, price });
+  renderCart();
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  renderCart();
+}
+
+function renderCart() {
+  const cartList = document.getElementById("cart-list");
+  cartList.innerHTML = "";
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${item.product} - R$ ${item.price.toFixed(2)}
+    <button onclick="removeFromCart(${index})">Remover</button>`;
+    cartList.appendChild(li);
+    total += item.price;
+  });
+
+  document.getElementById("total").innerText = `Total: R$ ${total.toFixed(2)}`;
+  document.getElementById("checkout-area").classList.toggle("checkout-hidden", cart.length === 0);
+}
+
+function mostrarBotaoEnviar() {
+  document.getElementById("enviarPedido").style.display = "inline-block";
+}
+
+document.getElementById("checkout-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const nome = document.getElementById("nome").value;
+  const telefone = document.getElementById("telefone").value;
+  const pagamento = document.getElementById("pagamento").value;
+
+  let message = `🛒 *Pedido Hana Ko*%0A%0A`;
+  cart.forEach(item => {
+    message += `Produto: ${item.product} - R$ ${item.price.toFixed(2)}%0A`;
+  });
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  message += `%0ATotal: R$ ${total.toFixed(2)}%0A%0A`;
+  message += `👤 *Cliente:* ${nome}%0A📞 *Telefone:* ${telefone}%0A💳 *Pagamento:* ${pagamento}`;
+
+  const whatsappUrl = `https://wa.me/5531999999999?text=${message}`;
+  window.open(whatsappUrl, "_blank");
+});
